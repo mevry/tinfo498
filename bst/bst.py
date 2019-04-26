@@ -10,5 +10,13 @@ class Bst:
             self._count = 1 
         
     def insert(self, data):
+        
         if self._root is None:
-            pass
+            self._root = Node(data, None)
+            break
+        node = Node(data)
+        #start at root
+        current = _root
+        if node.get_value() < current.get_value():
+            current.set_left()
+        
