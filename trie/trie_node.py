@@ -5,6 +5,7 @@ class TrieNode():
         self._value = value
         self._children = {}
         self._word = False
+        self._usage_count = 0
 
     #add node for character
     def add_child(self, child_character):
