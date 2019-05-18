@@ -39,7 +39,8 @@ class Trie():
             word_in_progress.append(k)
             #if its a complete word, we can print it
             if v._word:
-                yield ''.join(map(str,word_in_progress))
+                print(''.join(map(str,word_in_progress)))
+                
 
             #if it has children we still need to move down the trie
             if v._children:
@@ -48,10 +49,23 @@ class Trie():
             word_in_progress.pop()
 
 
-    def enumerate(self):
-        word = []
-        self._build_word(word, self._root)
-        print("Number of words: ", self.num_words)
+    def enumerate(self, word_in_progress=None, parent_node=None):
+        wip = []
+        if word_in_progress == None:
+            word_in_progress = wip
+        if parent_node == None:
+            parent_node = self._root
+        for k,v in parent_node._children.items():
+            word_in_progress.append(k)
+            #if its a complete word, we can print it
+            if v._word:
+                yield ''.join(map(str,word_in_progress))
+                
+            #if it has children we still need to move down the trie
+            if v._children:
+                self.enumerate(word_in_progress, v)
+            #no children, we can start removing chars
+            word_in_progress.pop()
 
             
     def search_word(self, word):
