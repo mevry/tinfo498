@@ -1,6 +1,11 @@
-from trie import Trie
+# from trie import Trie
 
 
-trie = Trie('C:\\Users\\derek\\Documents\\repos\\tinfo498\\trie\\wordlist.txt')
 
-trie.enumerate()
+
+import curses
+import os
+
+stdscr = curses.initscr()
+
+stdscr.keypad(True)

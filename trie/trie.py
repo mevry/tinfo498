@@ -39,7 +39,8 @@ class Trie():
             word_in_progress.append(k)
             #if its a complete word, we can print it
             if v._word:
-                print(''.join(map(str,word_in_progress)))
+                yield ''.join(map(str,word_in_progress))
+
             #if it has children we still need to move down the trie
             if v._children:
                 self._build_word(word_in_progress, v)

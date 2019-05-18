@@ -1,2 +1,6 @@
 trie/__pycache__/trie.cpython-37.pyc
 trie/__pycache__/trie_node.cpython-37.pyc
+.vscode/
+.vs/
+.pytest_cache/
+*__pycache__/
