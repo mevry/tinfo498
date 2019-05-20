@@ -13,4 +13,5 @@ class Test_TrieEnumerate(unittest.TestCase):
     word.append(trie.enumerate(word))
     print(word)
     print("omg")
+    unittest.TestCase.assertEquals(True, True)
 

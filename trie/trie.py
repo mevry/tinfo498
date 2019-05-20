@@ -68,8 +68,9 @@ class Trie():
             word_in_progress.pop()
 
             
-    def search_word(self, word):
-        pass
+    def predict(self, text):
+        prediction = "funtimes"
+        return prediction
 
     def insert_child(self, child_node):
         pass
