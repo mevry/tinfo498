@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 import sys
 import os.path
 from pathlib import Path
-from trie.trie import *
+from trie.trie import Trie
 
 
 test_path = Path.cwd() / 'data/wordlist.txt'
@@ -31,6 +31,7 @@ class HelloWorldDialog(QDialog):
     def changeTextLabel(self, text):
         prediction = trie.predict(text)
         self.label.setText(prediction)
+
 app = QApplication(sys.argv)
 window = HelloWorldDialog()
 window.show()

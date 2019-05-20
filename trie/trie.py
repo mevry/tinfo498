@@ -1,4 +1,4 @@
-from trie_node import TrieNode
+from trie.trie_node import TrieNode
 
 class Trie():
     
@@ -7,7 +7,8 @@ class Trie():
         self._root._isroot = True
         self.num_words = 0
         self.build_trie(wordlist_path)
-        
+        self.word_in_progress
+
     def _word_increment(self, current_node, current_word, current_char):
         if current_char == current_word[-1]:
             current_node._word = True
@@ -34,7 +35,7 @@ class Trie():
                         current = current.get_child_node(char)
                         self._word_increment(current, word_strip, char)
 
-    def _build_word(self,word_in_progress, parent_node):
+    def _build_word(self, word_in_progress, parent_node):
         for k,v in parent_node._children.items():
             word_in_progress.append(k)
             #if its a complete word, we can print it
@@ -50,10 +51,9 @@ class Trie():
 
 
     def enumerate(self, word_in_progress=None, parent_node=None):
-        wip = []
-        if word_in_progress == None:
-            word_in_progress = wip
-        if parent_node == None:
+        if word_in_progress is None:
+            self.word_in_progress = []
+        if parent_node is None:
             parent_node = self._root
         for k,v in parent_node._children.items():
             word_in_progress.append(k)
@@ -69,7 +69,7 @@ class Trie():
 
             
     def predict(self, text):
-        prediction = "funtimes"
+        prediction = text +"funtimes"
         return prediction
 
     def insert_child(self, child_node):
