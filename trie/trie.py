@@ -6,8 +6,8 @@ class Trie():
         self._root = TrieNode("root")
         self._root._isroot = True
         self.num_words = 0
+        self.word_in_progress = []
         self.build_trie(wordlist_path)
-        self.word_in_progress
 
     def _word_increment(self, current_node, current_word, current_char):
         if current_char == current_word[-1]:
@@ -52,7 +52,7 @@ class Trie():
 
     def enumerate(self, word_in_progress=None, parent_node=None):
         if word_in_progress is None:
-            self.word_in_progress = []
+            word_in_progress = self.word_in_progress
         if parent_node is None:
             parent_node = self._root
         for k,v in parent_node._children.items():
@@ -66,11 +66,18 @@ class Trie():
                 self.enumerate(word_in_progress, v)
             #no children, we can start removing chars
             word_in_progress.pop()
-
             
-    def predict(self, text):
-        prediction = text +"funtimes"
-        return prediction
+    def find_subtree(self, text, parent_node=None):
+        #Search for text
+        if parent_node is None:
+            parent_node = self._root
+        if text[0] is not None and text[0] in parent_node._children.keys():
+            self.predict(text[1:], parent_node)
+        return parent_node
+
+        #Return subtree of text
+
+        #Sort subtree by ranking (priority queue)
 
     def insert_child(self, child_node):
         pass
