@@ -1,0 +1,10 @@
+and,25
+a,3
+ant,18
+can,34
+an,50
+been,19
+bean,7
+be,13
+pterodactyl,49
+
