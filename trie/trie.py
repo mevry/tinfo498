@@ -9,6 +9,7 @@ class Trie():
         self.num_words = 0
         self.word_in_progress = []
         self.build_trie(wordlist_path)
+        self.best_candidate = ('', 0)
 
     def _word_increment(self, current_node, current_word, current_char, frequency):
         if current_char == current_word[-1]:
@@ -23,7 +24,7 @@ class Trie():
             csv_reader = csv.DictReader(wordlist, fieldnames=fieldnames)
             for row in csv_reader:
                 word_strip = row["word"]
-                freq_strip = row["frequency"]
+                freq_strip = int(row["frequency"])
                 current = self._root
                 for char in word_strip:
                     #check if char exists
@@ -75,35 +76,46 @@ class Trie():
         #Search for text
         if parent_node is None:
             parent_node = self._root
-        if text[0] is not None and text[0] in parent_node._children.keys():
-            self.find_subtree(text[1:], text[0])
+        
+        #skip if empty string or 1st char has no children
+        if text is not '' and str(text[0]) in parent_node._children.keys():
+            parent_node = parent_node.get_child_node(text[0])
+            self.find_subtree(text[1:], parent_node)
         if parent_node is self._root:
             parent_node = None
         return parent_node
 
 
     def search_candidates(self, word_in_progress, parent_node):
+
         if parent_node is None:
             return
         if parent_node._children.items() is not None:
-            print(parent_node._value)
-            print(parent_node._children.items())
             for k,v in parent_node._children.items():
-                print(v._frequency)
-                print(self.best_candidate[1])
+                self.word_in_progress.append(k)
+                print("Word in progress: " + ''.join(map(str,self.word_in_progress)))
+                print(str(k) + " Frequency: " + str(v._frequency))
+                print("Current Best Candidate: " + str(self.best_candidate[0]))
                 #if its a complete word, check candidacy
                 if v._word and v._frequency > self.best_candidate[1]:
-                    self.best_candidate = v._frequency
+                    self.best_candidate = (''.join(map(str,self.word_in_progress)), v._frequency)
+                    print("BC Tuple")
+                    print("--------")
+                    print(self.best_candidate)
                 #if it has children we still need to move down subtree
                 if v._children:
-                    self.search_candidates(word_in_progress, v)
+                    self.search_candidates(self.word_in_progress, v)
                 #no children, we can start removing chars
-                word_in_progress.pop()
+                if len(self.word_in_progress) > 0:
+                    self.word_in_progress.pop()
 
     def predict(self, text):
-        wip = []
+        print("Passed In: " + text)
+        self.word_in_progress = []
+        for char in text:
+            self.word_in_progress.append(char)
         self.best_candidate = ('', 0)
-        self.search_candidates(wip, self.find_subtree(text))
+        self.search_candidates(self.word_in_progress, self.find_subtree(text))
         return self.best_candidate[0]
 
 
