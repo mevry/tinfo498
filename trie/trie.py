@@ -77,25 +77,34 @@ class Trie():
             parent_node = self._root
         if text[0] is not None and text[0] in parent_node._children.keys():
             self.find_subtree(text[1:], text[0])
+        if parent_node is self._root:
+            parent_node = None
         return parent_node
 
 
     def search_candidates(self, word_in_progress, parent_node):
-        for k,v in parent_node._children.items():
-            #if its a complete word, check candidacy
-            if v._word and v._frequency > self.best_candidate[1]:
-                self.best_candidate = v._frequency
-            #if it has children we still need to move down subtree
-            if v._children:
-                self.search_candidates(word_in_progress, v)
-            #no children, we can start removing chars
-            word_in_progress.pop()
+        if parent_node is None:
+            return
+        if parent_node._children.items() is not None:
+            print(parent_node._value)
+            print(parent_node._children.items())
+            for k,v in parent_node._children.items():
+                print(v._frequency)
+                print(self.best_candidate[1])
+                #if its a complete word, check candidacy
+                if v._word and v._frequency > self.best_candidate[1]:
+                    self.best_candidate = v._frequency
+                #if it has children we still need to move down subtree
+                if v._children:
+                    self.search_candidates(word_in_progress, v)
+                #no children, we can start removing chars
+                word_in_progress.pop()
 
     def predict(self, text):
         wip = []
-        self.best_candidate = (None, 0)
+        self.best_candidate = ('', 0)
         self.search_candidates(wip, self.find_subtree(text))
-        return self.best_candidate
+        return self.best_candidate[0]
 
 
         #Return subtree of text
