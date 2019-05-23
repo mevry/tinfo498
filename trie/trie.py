@@ -1,5 +1,6 @@
 from trie.trie_node import TrieNode
 import csv
+import time
 
 class Trie():
     
@@ -21,6 +22,7 @@ class Trie():
         return ''.join(map(str,self.word_in_progress))
 
     def build_trie(self, wordlist_path):
+        build_time = time.time()
         #open wordlist file
         with open(wordlist_path, 'r') as wordlist:
             fieldnames = ("word", "frequency")
@@ -42,6 +44,7 @@ class Trie():
                     else:
                         current = current.get_child_node(char)
                         self._word_increment(current, word_strip, char, freq_strip)
+        print("Trie build time: " + str(time.time() - build_time))
 
     def _build_word(self, word_in_progress, parent_node):
         for k,v in parent_node._children.items():
@@ -75,7 +78,7 @@ class Trie():
         #Start at root
         if current_node is None:
             current_node = self._root
-        print("Parent: " + current_node._value)
+        #print("Current Node: " + current_node._value)
         #if no matching child, then there is no possible match
         if str(text[0]) not in current_node._children.keys():
             current_node = None
@@ -101,6 +104,7 @@ class Trie():
                     self.search_candidates(v)
                 #no children, we can start removing chars
                 self.word_in_progress.pop()
+        
 
     def predict(self, text):
         #Reset/Initialize
@@ -110,7 +114,9 @@ class Trie():
         self.best_candidate = ('', 0)
         #if text is empty, no need to search
         if text is not '':
+            search_start = time.time()
             self.search_candidates(self.find_subtree(text))
+            print(text + " search time: " + str(time.time()-search_start))
         return self.best_candidate[0]
 
     def insert_child(self, child_node):
