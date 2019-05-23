@@ -2,8 +2,8 @@ from trie.trie_node import TrieNode
 import csv
 import time
 
+
 class Trie():
-    
     def __init__(self, wordlist_path):
         self._root = TrieNode("root")
         self._root._isroot = True
@@ -22,6 +22,7 @@ class Trie():
         return ''.join(map(str,self.word_in_progress))
 
     def build_trie(self, wordlist_path):
+        print("Building trie...")
         build_time = time.time()
         #open wordlist file
         with open(wordlist_path, 'r') as wordlist:
@@ -105,7 +106,6 @@ class Trie():
                 #no children, we can start removing chars
                 self.word_in_progress.pop()
         
-
     def predict(self, text):
         #Reset/Initialize
         self.word_in_progress = []

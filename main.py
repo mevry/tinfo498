@@ -14,11 +14,13 @@ class HelloWorldDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
 
+        #Set up widgets
         layout = QVBoxLayout()
-        self.label = QLabel("Hello World")
+        self.label = QLabel("Trie Predictive Text")
         text_box = QLineEdit()
         button = QPushButton("Close")
 
+        #Add widgets to dialog box
         layout.addWidget(self.label)
         layout.addWidget(text_box)
         layout.addWidget(button)
