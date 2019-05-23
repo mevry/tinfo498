@@ -7,7 +7,7 @@ from pathlib import Path
 from trie.trie import Trie
 
 
-test_path = Path.cwd() / 'data/new_dictionary.txt'
+test_path = Path.cwd() / 'data/wordlist.10000.rank.txt'
 trie = Trie(test_path)
 
 class HelloWorldDialog(QDialog):
