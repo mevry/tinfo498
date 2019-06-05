@@ -29,3 +29,5 @@ class TrieNode():
         else:
             return True
     
+    def increment_frequency(self):
+        self._frequency += 1

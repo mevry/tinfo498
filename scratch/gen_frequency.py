@@ -12,4 +12,4 @@ def gen_rand_freq(max_rand_val, in_file, out_path=Path.cwd()):
 #foreach word, generate k,v w/random val 
 infile = Path.cwd() / 'data/wordlist.10000.txt'
 outfile = Path.cwd() / 'data/wordlist.10000.rank.txt'
-gen_rand_freq(1000, infile, outfile)
+gen_rand_freq(1, infile, outfile)
