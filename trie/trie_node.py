@@ -6,6 +6,7 @@ class TrieNode():
         self._children = {}
         self._word = False
         self._frequency = 0
+        self._personal_freq = 0
 
     #add node for character
     def add_child(self, child_character):
@@ -28,12 +29,24 @@ class TrieNode():
             return False
         else:
             return True
+
+    def set_base_freq(self, freq):
+        self._frequency = freq
     
     def get_frequency(self):
-        return self._frequency
+        return self._frequency + self._personal_freq
 
     def increment_frequency(self):
-        self._frequency += 1
+        self._personal_freq += 1
+
+    def set_personal_freq(self, freq):
+        self._personal_freq = freq
+    
+    def get_personal_freq(self):
+        return self._personal_freq
 
     def is_word(self):
         return self._word
+
+    def set_word(self, val):
+        self._word = val

@@ -16,31 +16,35 @@ class TrieWindow(QMainWindow):
         self.setMinimumSize(QSize(400,400))
         self.setWindowTitle("Trie Text Prediction")
 
+        #Set up base widget & layout
         centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
-        #Set up widgets
         layout = QGridLayout(self)
         centralWidget.setLayout(layout)
+
+        #Set up widgets
         self.label = QLabel("Trie Predictive Text")
         self.label.setAlignment(Qt.AlignLeft)
+        self.rank = QLabel()
         self.text_box = QLineEdit()
         self.text_box.setAlignment(Qt.AlignLeft)
-        #button = QPushButton("Close")
+        button = QPushButton("Save")
 
         #Add widgets to dialog box
         layout.addWidget(self.label)
+        layout.addWidget(self.rank)
         layout.addWidget(self.text_box)
-        #layout.addWidget(button)
+        layout.addWidget(button)
 
-        #self.setLayout(layout)
-
-        #button.clicked.connect(self.close)
+        #Events
+        button.clicked.connect(trie.save_custom)
         self.text_box.textChanged.connect(self.changeTextLabel)
         self.text_box.returnPressed.connect(self.update_rank)
 
     def changeTextLabel(self, text):
         prediction = trie.predict(text)
-        self.label.setText(prediction)
+        self.label.setText(prediction[0])
+        self.rank.setText(str(prediction[1]))
 
     def update_rank(self):
         trie.update_rank(self.text_box.text())

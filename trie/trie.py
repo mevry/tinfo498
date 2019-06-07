@@ -1,4 +1,6 @@
 from trie.trie_node import TrieNode
+from tempfile import NamedTemporaryFile
+import shutil
 import csv
 import time
 
@@ -11,15 +13,54 @@ class Trie():
         self.word_in_progress = []
         self.build_trie(wordlist_path)
         self.best_candidate = ('', 0)
+        self.word_buffer = {}
 
     def _word_increment(self, current_node, current_word, current_char, frequency):
+        #if last char, then must be word
         if current_char == current_word[-1]:
-            current_node._word = True
-            current_node._frequency = frequency
+            current_node.set_word(True)
+            current_node.set_base_freq(frequency)
             self.num_words += 1
 
     def _get_wip(self):
-        return ''.join(map(str,self.word_in_progress))
+        return ''.join(map(str, self.word_in_progress))
+
+    def save_custom(self):
+        print("Saving trie...")
+        personal_wordlist_path = 'data/personal.txt'
+        temp_wordlist = NamedTemporaryFile(mode='w', newline='', delete=False)
+        fields = ['word', 'frequency']
+
+        with open(personal_wordlist_path, 'r', newline='') as personal, temp_wordlist:
+            reader = csv.DictReader(personal, fieldnames=fields)
+            writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
+            for line in reader:
+                for word, freq in self.word_buffer.items():
+                    if line['word'] == word:
+                        line['frequency'] = str(int(line['frequency']) + int(freq))
+                        line = {'word': line['word'], 'frequency': line['frequency']}
+                        writer.writerow(line)
+        shutil.move(temp_wordlist.name, personal_wordlist_path)
+        # with open('data/personal.txt', 'w+') as personal:
+        #     for k, v in self.word_buffer.items():
+        #         personal.write('{word},{freq}\n'.format(word=k, freq=v))
+        temp_wordlist = NamedTemporaryFile(mode='a', newline='', delete=False)
+        with open(personal_wordlist_path, 'r', newline= '') as personal, temp_wordlist:
+            reader = csv.DictReader(personal, fieldnames=fields)
+            writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
+            for word, freq in self.word_buffer.items():
+                word_in_line = False
+                for line in reader:
+                    if line['word'] == word:
+                        word_in_line = True
+                if word_in_line is False:
+                    line = {'word': word, 'frequency': freq}
+                    writer.writerow(line)
+        shutil.move(temp_wordlist.name, personal_wordlist_path)
+        self.word_buffer = {}
+        temp_wordlist = None
+        print("Saved")
+      
 
     def build_trie(self, wordlist_path):
         print("Building trie...")
@@ -37,15 +78,30 @@ class Trie():
                     #if no, add and update pointer
                     if not current.node_exists(char):
                         current.add_child(char)
-                        #move down tree
-                        current = current.get_child_node(char)
-                        #if last char in word, mark as complete word
-                        self._word_increment(current, word_strip, char, freq_strip)
-                    #if yes, update pointer
-                    else:
-                        current = current.get_child_node(char)
-                        self._word_increment(current, word_strip, char, freq_strip)
+                    #move down tree
+                    current = current.get_child_node(char)
+                if not current.is_word():
+                    current.set_word(True)
+                    self.num_words += 1
+                current.set_base_freq(freq_strip)                
+        with open('data/personal.txt', 'r') as custom_wordlist:
+            fieldnames = ("word", "frequency")
+            csv_reader = csv.DictReader(custom_wordlist, fieldnames=fieldnames)
+            for row in csv_reader:
+                word = row["word"]
+                freq = int(row["frequency"])
+                print('Adding: {word}, {freq}'.format(word=word, freq=freq))
+                current = self._root
+                for char in word:
+                    if not current.node_exists(char):
+                        current.add_child(char)
+                    current = current.get_child_node(char)
+                if not current.is_word():
+                    current.set_word(True)
+                    self.num_words += 1
+                current.set_personal_freq(freq)
         print("Trie build time: " + str(time.time() - build_time))
+        print("Trie number of words: " + str(self.num_words))
 
     def _build_word(self, word_in_progress, parent_node):
         for k,v in parent_node._children.items():
@@ -59,6 +115,22 @@ class Trie():
             #no children, we can start removing chars
             word_in_progress.pop()
 
+    def enumerate_save(self, word_in_progress=None, parent_node=None, handle=None):
+            if word_in_progress is None:
+                word_in_progress = self.word_in_progress
+            if parent_node is None:
+                parent_node = self._root
+            for k,v in parent_node._children.items():
+                word_in_progress.append(k)
+                #if its a complete word, we can print it
+                if v.is_word() and v.get_personal_freq() > 0:
+                    handle.write("{custom},{freq}\n".format(custom=''.join(map(str, word_in_progress)), freq=str(v.get_personal_freq())))
+                #if it has children we still need to move down the trie
+                if v._children:
+                    self.enumerate_save(word_in_progress, v)
+                #no children, we can start removing chars
+                word_in_progress.pop()
+
     def enumerate(self, word_in_progress=None, parent_node=None):
         if word_in_progress is None:
             word_in_progress = self.word_in_progress
@@ -68,7 +140,7 @@ class Trie():
             word_in_progress.append(k)
             #if its a complete word, we can print it
             if v._word:
-                print(''.join(map(str, word_in_progress)) + " " + str(v._frequency)) 
+                print(''.join(map(str, word_in_progress)) + " " + str(v.get_frequency())) 
             #if it has children we still need to move down the trie
             if v._children:
                 self.enumerate(word_in_progress, v)
@@ -79,7 +151,11 @@ class Trie():
         node = self.find_subtree(text)
         if node is not None and node.is_word():
             node.increment_frequency()
-            print("{text}: {freq}".format(text=text,freq=node.get_frequency()))
+            self.word_buffer[text] = node.get_personal_freq()
+            print("{text}: {freq}".format(text=text, freq=node.get_frequency()))
+            print("Current word buffer: ")
+            for k in self.word_buffer.keys():
+                print(k)
         else:
             print("{text} is not in dictionary".format(text=text))
 
@@ -96,6 +172,8 @@ class Trie():
             #If there are more chars in text, recurse
             if text[1:]:
                 current_node = self.find_subtree(text[1:], current_node)
+
+        print("Current Node: " + current_node.get_value()) if current_node is not None else print("Current Node: None")
         return current_node
 
     def search_candidates(self, current_node):
@@ -106,8 +184,8 @@ class Trie():
             for k,v in current_node._children.items():
                 self.word_in_progress.append(k)
                 #if its a complete word, check candidacy
-                if v._word and v._frequency > self.best_candidate[1]:
-                    self.best_candidate = (''.join(map(str,self.word_in_progress)), v._frequency)
+                if v.is_word() and v.get_frequency() > self.best_candidate[1]:
+                    self.best_candidate = (''.join(map(str,self.word_in_progress)), v.get_frequency())
                 #if it has children we still need to move down subtree
                 if v._children:
                     self.search_candidates(v)
@@ -125,8 +203,7 @@ class Trie():
             search_start = time.time()
             self.search_candidates(self.find_subtree(text))
             print(text + " search time: " + str(time.time()-search_start))
-        return self.best_candidate[0]
+        return self.best_candidate
 
     def remove_child(self, child_node):
         pass
-        
