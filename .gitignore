@@ -3,3 +3,4 @@ trie/__pycache__/trie_node.cpython-37.pyc
 .vs/
 .pytest_cache/
 *__pycache__/
+data/personal_wordlist.*

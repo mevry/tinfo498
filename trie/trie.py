@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 import shutil
 import csv
 import time
+import shelve
 
 
 class Trie():
@@ -27,38 +28,42 @@ class Trie():
 
     def save_custom(self):
         print("Saving trie...")
-        personal_wordlist_path = 'data/personal.txt'
-        temp_wordlist = NamedTemporaryFile(mode='w', newline='', delete=False)
-        fields = ['word', 'frequency']
+        with shelve.open('data/personal_wordlist') as personal_wordlist:
+            for k, v in self.word_buffer.items():
+                personal_wordlist[str(k)] = v
 
-        with open(personal_wordlist_path, 'r', newline='') as personal, temp_wordlist:
-            reader = csv.DictReader(personal, fieldnames=fields)
-            writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
-            for line in reader:
-                for word, freq in self.word_buffer.items():
-                    if line['word'] == word:
-                        line['frequency'] = str(int(line['frequency']) + int(freq))
-                        line = {'word': line['word'], 'frequency': line['frequency']}
-                        writer.writerow(line)
-        shutil.move(temp_wordlist.name, personal_wordlist_path)
-        # with open('data/personal.txt', 'w+') as personal:
-        #     for k, v in self.word_buffer.items():
-        #         personal.write('{word},{freq}\n'.format(word=k, freq=v))
-        temp_wordlist = NamedTemporaryFile(mode='a', newline='', delete=False)
-        with open(personal_wordlist_path, 'r', newline= '') as personal, temp_wordlist:
-            reader = csv.DictReader(personal, fieldnames=fields)
-            writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
-            for word, freq in self.word_buffer.items():
-                word_in_line = False
-                for line in reader:
-                    if line['word'] == word:
-                        word_in_line = True
-                if word_in_line is False:
-                    line = {'word': word, 'frequency': freq}
-                    writer.writerow(line)
-        shutil.move(temp_wordlist.name, personal_wordlist_path)
+            
+        # temp_wordlist = NamedTemporaryFile(mode='w', newline='', delete=False)
+        # fields = ['word', 'frequency']
+
+        # with open(personal_wordlist_path, 'r', newline='') as personal, temp_wordlist:
+        #     reader = csv.DictReader(personal, fieldnames=fields)
+        #     writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
+        #     for line in reader:
+        #         for word, freq in self.word_buffer.items():
+        #             if line['word'] == word:
+        #                 line['frequency'] = str(int(line['frequency']) + int(freq))
+        #                 line = {'word': line['word'], 'frequency': line['frequency']}
+        #                 writer.writerow(line)
+        # shutil.move(temp_wordlist.name, personal_wordlist_path)
+        # # with open('data/personal.txt', 'w+') as personal:
+        # #     for k, v in self.word_buffer.items():
+        # #         personal.write('{word},{freq}\n'.format(word=k, freq=v))
+        # temp_wordlist = NamedTemporaryFile(mode='a', newline='', delete=False)
+        # with open(personal_wordlist_path, 'r', newline= '') as personal, temp_wordlist:
+        #     reader = csv.DictReader(personal, fieldnames=fields)
+        #     writer = csv.DictWriter(temp_wordlist, fieldnames=fields)
+        #     for word, freq in self.word_buffer.items():
+        #         word_in_line = False
+        #         for line in reader:
+        #             if line['word'] == word:
+        #                 word_in_line = True
+        #         if word_in_line is False:
+        #             line = {'word': word, 'frequency': freq}
+        #             writer.writerow(line)
+        # shutil.move(temp_wordlist.name, personal_wordlist_path)
         self.word_buffer = {}
-        temp_wordlist = None
+        #temp_wordlist = None
         print("Saved")
       
 
@@ -84,12 +89,26 @@ class Trie():
                     current.set_word(True)
                     self.num_words += 1
                 current.set_base_freq(freq_strip)                
-        with open('data/personal.txt', 'r') as custom_wordlist:
-            fieldnames = ("word", "frequency")
-            csv_reader = csv.DictReader(custom_wordlist, fieldnames=fieldnames)
-            for row in csv_reader:
-                word = row["word"]
-                freq = int(row["frequency"])
+        # with open('data/personal.txt', 'r') as custom_wordlist:
+        #     fieldnames = ("word", "frequency")
+        #     csv_reader = csv.DictReader(custom_wordlist, fieldnames=fieldnames)
+        #     for row in csv_reader:
+        #         word = row["word"]
+        #         freq = int(row["frequency"])
+        #         print('Adding: {word}, {freq}'.format(word=word, freq=freq))
+        #         current = self._root
+        #         for char in word:
+        #             if not current.node_exists(char):
+        #                 current.add_child(char)
+        #             current = current.get_child_node(char)
+        #         if not current.is_word():
+        #             current.set_word(True)
+        #             self.num_words += 1
+        #         current.set_personal_freq(freq)
+        with shelve.open('data/personal_wordlist') as custom_wordlist:
+            for k, v in custom_wordlist.items():
+                word = str(k)
+                freq = int(v)
                 print('Adding: {word}, {freq}'.format(word=word, freq=freq))
                 current = self._root
                 for char in word:
