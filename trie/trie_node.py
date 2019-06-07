@@ -29,5 +29,11 @@ class TrieNode():
         else:
             return True
     
+    def get_frequency(self):
+        return self._frequency
+
     def increment_frequency(self):
         self._frequency += 1
+
+    def is_word(self):
+        return self._word

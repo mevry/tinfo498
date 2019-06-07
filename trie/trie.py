@@ -74,7 +74,15 @@ class Trie():
                 self.enumerate(word_in_progress, v)
             #no children, we can start removing chars
             word_in_progress.pop()
-            
+
+    def update_rank(self, text):
+        node = self.find_subtree(text)
+        if node is not None and node.is_word():
+            node.increment_frequency()
+            print("{text}: {freq}".format(text=text,freq=node.get_frequency()))
+        else:
+            print("{text} is not in dictionary".format(text=text))
+
     def find_subtree(self, text, current_node=None):
         #Start at root
         if current_node is None:
@@ -119,11 +127,6 @@ class Trie():
             print(text + " search time: " + str(time.time()-search_start))
         return self.best_candidate[0]
 
-    def insert_child(self, child_node):
-        pass
-        
     def remove_child(self, child_node):
         pass
         
-    def find(self, character):
-        pass
