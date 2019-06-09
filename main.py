@@ -13,7 +13,7 @@ trie = Trie(test_path)
 class TrieWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
-        self.setMinimumSize(QSize(400,400))
+        #self.setMinimumSize(QSize(400,400))
         self.setWindowTitle("Trie Text Prediction")
 
         #Set up base widget & layout
@@ -23,18 +23,35 @@ class TrieWindow(QMainWindow):
         centralWidget.setLayout(layout)
 
         #Set up widgets
-        self.label = QLabel("Trie Predictive Text")
+        font = QFont('SansSerif', 14)
+
+        self.label2 = QLabel("<b>Prediction:</b>")
+        self.label2.setFont(font)
+        self.label2.setAlignment(Qt.AlignLeft)
+
+        self.label = QLabel()
+        self.label.setFont(font)
         self.label.setAlignment(Qt.AlignLeft)
+
+
+        self.rank_label = QLabel("<b>Frequency:</b>")
+        self.rank_label.setAlignment(Qt.AlignLeft)
+        self.rank_label.setFont(font)
+
         self.rank = QLabel()
+        self.rank.setFont(font)
+
         self.text_box = QLineEdit()
         self.text_box.setAlignment(Qt.AlignLeft)
         button = QPushButton("Save")
 
         #Add widgets to dialog box
-        layout.addWidget(self.label)
-        layout.addWidget(self.rank)
-        layout.addWidget(self.text_box)
-        layout.addWidget(button)
+        layout.addWidget(self.label2, 0, 0)
+        layout.addWidget(self.label, 1, 0)
+        layout.addWidget(self.rank_label, 2, 0)
+        layout.addWidget(self.rank, 3, 0)
+        layout.addWidget(self.text_box, 4, 0)
+        layout.addWidget(button, 5, 0)
 
         #Events
         button.clicked.connect(trie.save_custom)
