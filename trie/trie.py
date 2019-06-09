@@ -70,6 +70,10 @@ class Trie():
                     current.set_word(True)
                     self.num_words += 1
                 current.set_personal_freq(freq)
+        children = self._root.get_children()
+        for child_node in children.values():
+            child_node.top_word = self.predict(child_node.get_value(), True)
+            print(child_node.top_word[0])
         print("Trie build time: " + str(time.time() - build_time))
         print("Trie number of words: " + str(self.num_words))
 
@@ -124,6 +128,9 @@ class Trie():
                 node.increment_frequency()
                 self.word_buffer[text] = node.get_personal_freq()
                 print("{text}: {freq}".format(text=text, freq=node.get_frequency()))
+                #update new L1 top child
+                child = self._root.get_child_node(text[0])
+                child.top_word = self.predict(child.get_value(), True)
                 print("Current word buffer: ")
                 for k in self.word_buffer.keys():
                     print(k)
@@ -163,7 +170,7 @@ class Trie():
                 #no children, we can start removing chars
                 self.word_in_progress.pop()
         
-    def predict(self, text):
+    def predict(self, text, init=False):
         #Reset/Initialize
         self.word_in_progress = []
         for char in text:
@@ -172,17 +179,14 @@ class Trie():
         #if text is empty, no need to search
         if text is not '':
             search_start = time.time()
-            self.search_candidates(self.find_subtree(text))
+            #if only 1 char, retrieve presearched results
+            if init is True:
+                self.search_candidates(self.find_subtree(text))
+            else:
+                if len(text) == 1:
+                    child = self._root.get_child_node(text)
+                    self.best_candidate = child.top_word
+                else:
+                    self.search_candidates(self.find_subtree(text))
             print(text + " search time: " + str(time.time()-search_start))
         return self.best_candidate
-
-# def _presearch(self, node):
-#     if self._level < 1:
-#         self._presearch(node.get_child_node)
-
-# def presearch(self):
-#     self._level = 0
-#     children = self._root.get_children()
-#     for child_node in children.values():
-#         child_node.top_
-#     _presearch(self._root)
